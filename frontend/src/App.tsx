@@ -29,6 +29,7 @@ function App() {
   return (
     <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
       {renderPage()}
+      
     </Layout>
   );
 }
