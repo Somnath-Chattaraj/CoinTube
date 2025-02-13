@@ -6,6 +6,8 @@ import { Portfolio } from './pages/Portfolio';
 import { Trading } from './pages/Trading';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { Routes, Route } from 'react-router-dom';
+import { Marketplace} from './pages/marketplace'
+
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
         <Route path='/admin' element={<AdminDashboard />}/>
         <Route path='/portfolio' element={<Portfolio />}/>
         <Route path='/coin/:id' element={<ChannelCoin />}/>
+        <Route path='/marketplace' element={<Marketplace />}/>
       </Route>
     </Routes>
   );

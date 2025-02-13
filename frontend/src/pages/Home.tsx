@@ -1,31 +1,32 @@
 // import React from 'react';
 import { TrendingUp, TrendingDown, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import { tokens } from '@/lib/tokens';
 export function Home() {
-  const trendingChannels = [
-    {
-      name: 'PewDiePie Coin',
-      price: '$12.45',
-      change: '+15.2%',
-      volume: '$1.2M',
-      image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=400&fit=crop',
-    },
-    {
-      name: 'MrBeast Coin',
-      price: '$45.78',
-      change: '+8.7%',
-      volume: '$2.5M',
-      image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=400&h=400&fit=crop',
-    },
-    {
-      name: 'Markiplier Coin',
-      price: '$8.92',
-      change: '-3.4%',
-      volume: '$892K',
-      image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=400&h=400&fit=crop',
-    },
-  ];
+  // const trendingChannels = [
+  //   {
+  //     name: 'PewDiePie Coin',
+  //     price: '$12.45',
+  //     change: '+15.2%',
+  //     volume: '$1.2M',
+  //     image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=400&fit=crop',
+  //   },
+  //   {
+  //     name: 'MrBeast Coin',
+  //     price: '$45.78',
+  //     change: '+8.7%',
+  //     volume: '$2.5M',
+  //     image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=400&h=400&fit=crop',
+  //   },
+  //   {
+  //     name: 'Markiplier Coin',
+  //     price: '$8.92',
+  //     change: '-3.4%',
+  //     volume: '$892K',
+  //     image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=400&h=400&fit=crop',
+  //   },
+  // ];
+  const trendingChannels = tokens.slice(0,3);
 
   const marketNews = [
     {
@@ -51,25 +52,25 @@ export function Home() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Trending Channel Coins</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {trendingChannels.map((channel, id) => (
+          {trendingChannels.map((channel) => (
             <Link
-              to= {"/coin/" + `${id}`}
+              to= {"/coin/" + `${channel.id}`}
               key={channel.name}
               className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition hover:scale-105"
             >
               <img
                 src={channel.image}
                 alt={channel.name}
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-contain"
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-900">{channel.name}</h3>
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-2xl font-bold text-gray-900">{channel.price}</span>
                   <span className={`flex items-center ${
-                    channel.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
+                    channel.change>0 ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {channel.change.startsWith('+') ? (
+                    {channel.change ? (
                       <TrendingUp className="h-4 w-4 mr-1" />
                     ) : (
                       <TrendingDown className="h-4 w-4 mr-1" />
