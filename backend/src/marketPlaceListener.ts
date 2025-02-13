@@ -20,7 +20,7 @@ async function main() {
         console.log("Listening for events on contract", contractAddress);
     }
     contract.on("TokenListed", async (token, seller, priceInWei, amount) => {
-        console.log("Token listed", token, seller, priceInWei, amount);
+        console.log("Token listed", token, seller, priceInWei, Number(amount));
         try {
             await prisma.$transaction(async (tx) => {
                 await tx.listedToken.create({
@@ -28,7 +28,7 @@ async function main() {
                         tokenAddress: token,
                         sellerWalletAddress: seller,
                         price: parseFloat(ethers.formatEther(priceInWei)),
-                        amount,
+                        amount: Number(amount) // Explicit conversion
                     },
                 });
             });
@@ -36,6 +36,7 @@ async function main() {
             console.error("Error handling TokenListed event:", error);
         }
     });
+    
 
     contract.on("TokenSold", async (token, buyer, seller, amount, priceInWei) => {
         console.log("Token sold", token, buyer, seller, amount, priceInWei);
@@ -46,7 +47,7 @@ async function main() {
                         tokenAddress: token,
                         buyerWalletAddress: buyer,
                         sellerWalletAddress: seller,
-                        amount,
+                        amount : Number(amount),
                         price: parseFloat(ethers.formatEther(priceInWei)),
                     },
                 });
@@ -57,20 +58,20 @@ async function main() {
 
                 await tx.walletToken.upsert({
                     where: { walletAddress_tokenAddress: { walletAddress: buyer, tokenAddress: token } },
-                    update: { quantity: { increment: amount } },
+                    update: { quantity: { increment: Number(amount) } },
                     create: {
                         wallet: { connect: { walletAddress: buyer } },
                         token: { connect: { tokenAddress: token } },
                         walletAddress: buyer,
                         tokenAddress: token,
-                        quantity: amount,
+                        quantity: Number(amount),
                         price: parseFloat(ethers.formatEther(priceInWei)),
                     },
                 });
                 
                 await tx.walletToken.upsert({
                     where: { walletAddress_tokenAddress: { walletAddress: seller, tokenAddress: token } },
-                    update: { quantity: { decrement: amount } },
+                    update: { quantity: { decrement: Number(amount) } },
                     create: {
                         wallet: { connect: { walletAddress: seller } },
                         token: { connect: { tokenAddress: token } },

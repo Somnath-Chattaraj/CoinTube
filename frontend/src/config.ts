@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { http, createConfig } from 'wagmi'
 import { base, mainnet, sepolia } from 'wagmi/chains'
 import { injected } from 'wagmi/connectors'
@@ -15,3 +16,6 @@ export const config = createConfig({
     [sepolia.id]: http(),
   },
 })
+=======
+export const BACKEND_URL = "http://localhost:3000/api";
+>>>>>>> cec3e3138128ab0af4bec06eb92d2238c7712ca6
