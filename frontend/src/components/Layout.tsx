@@ -2,10 +2,20 @@ import { useState } from 'react';
 import { Search, Wallet, User, Menu, X, Youtube } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
+import { useConnect, useAccount, useDisconnect } from 'wagmi';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
 
 export function Layout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { connectors, connect } = useConnect();
+  const { isConnected, address } = useAccount();
+  const { disconnect } = useDisconnect();
 
   const navigation = [
     { name: 'Home', value: 'home' },
@@ -14,6 +24,10 @@ export function Layout() {
     { name: 'Creator Dashboard', value: 'admin' },
     { name: 'Marketplace', value: 'marketplace' },
   ];
+
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -62,9 +76,30 @@ export function Layout() {
 
             {/* Right side buttons */}
             <div className="flex items-center">
-              <button title='wallet' className="p-2 text-gray-600 hover:text-gray-900">
+              {
+                !isConnected ? (
+              connectors.slice(0,1).map((connector) => 
+              <button title='wallet' key={connector.uid} onClick={() => connect({ connector })} className="flex w-fl gap-3 pl-3 pr-3 py-2 border border-gray-300 rounded-md bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 <Wallet className="h-6 w-6" />
+                <div>Connect Wallet</div>
               </button>
+              ))
+              :
+              (
+                <Popover>
+                  <PopoverTrigger className="flex w-fl gap-3 pl-3 pr-3 py-2 border border-gray-300 rounded-md bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    {truncateAddress(address!)}
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    {"Wallet address: "+`${address}`}
+                    <button title='wallet' key={address} onClick={() => disconnect()} className="mt-2 flex w-fl gap-3 pl-3 pr-3 py-2 border border-gray-300 rounded-md bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <Wallet className="h-6 w-6" />
+                    Disconnect
+                  </button>
+                  </PopoverContent>
+                </Popover>
+              )
+            }
               
               <div className="ml-3 relative">
                 <button
