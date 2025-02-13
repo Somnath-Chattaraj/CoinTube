@@ -12,6 +12,7 @@ export function Layout() {
     { name: 'Trading', value: 'trading' },
     { name: 'Portfolio', value: 'portfolio' },
     { name: 'Creator Dashboard', value: 'admin' },
+    { name: 'Marketplace', value: 'marketplace' },
   ];
 
   return (
