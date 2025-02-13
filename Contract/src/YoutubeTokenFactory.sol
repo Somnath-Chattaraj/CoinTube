@@ -10,7 +10,7 @@ contract YouTubeTokenFactory {
 
     address public marketplace; // ✅ Marketplace contract address
 
-    event TokenCreated(address indexed creator, address tokenAddress);
+    event TokenCreated(address indexed creator, address tokenAddress, string name, string symbol, uint256 initialSupply, uint256 royaltyFee);
     event MarketplaceUpdated(address newMarketplace);
     event ApprovalGranted(address indexed creator, address indexed token, address spender, uint256 amount);
 
@@ -34,7 +34,7 @@ contract YouTubeTokenFactory {
         allTokens.push(address(token));
         IERC20(address(token)).approve(marketplace, type(uint256).max);
 
-        emit TokenCreated(msg.sender, address(token));
+        emit TokenCreated(msg.sender, address(token), name, symbol, initialSupply, royaltyFee);
     }
     function getAllTokens() public view returns (address[] memory) {
         return allTokens;
