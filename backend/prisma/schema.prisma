@@ -11,7 +11,6 @@ model User {
   id            String   @id @default(uuid())
   email         String   @unique
   name          String?
-  walletAddress String   @unique
   wallets       Wallet[]
   createdAt     DateTime @default(now())
 }
@@ -32,6 +31,7 @@ model Token {
   id                      String        @id @default(uuid())
   tokenAddress            String        @unique
   name                    String
+  symbol                  String
   price                   Float
   creatorAddress          String
   royaltyRecipientAddress String
