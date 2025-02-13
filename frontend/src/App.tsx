@@ -15,7 +15,7 @@ function App() {
         <Route path='/trading' element={<Trading />}/>
         <Route path='/admin' element={<AdminDashboard />}/>
         <Route path='/portfolio' element={<Portfolio />}/>
-        <Route path='/coin' element={<ChannelCoin />}/>
+        <Route path='/coin/:id' element={<ChannelCoin />}/>
       </Route>
     </Routes>
   );

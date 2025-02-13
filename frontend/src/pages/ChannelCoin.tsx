@@ -1,7 +1,36 @@
 // import React from 'react';
 import { TrendingUp, Users, DollarSign, BarChart3 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 
 export function ChannelCoin() {
+  const trendingChannels = [
+    {
+      name: 'PewDiePie Coin',
+      creator: 'Pewdiepie',
+      price: '$12.45',
+      change: '+15.2%',
+      volume: '$1.2M',
+      image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=400&fit=crop',
+    },
+    {
+      name: 'MrBeast Coin',
+      creator: 'MrBeast',
+      price: '$45.78',
+      change: '+8.7%',
+      volume: '$2.5M',
+      image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=400&h=400&fit=crop',
+    },
+    {
+      name: 'Markiplier Coin',
+      creator: 'Markiplier',
+      price: '$8.92',
+      change: '-3.4%',
+      volume: '$892K',
+      image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=400&h=400&fit=crop',
+    },
+  ];
+
+  const { id } = useParams();
   return (
     <div className="space-y-6">
       {/* Channel Banner */}
@@ -18,8 +47,8 @@ export function ChannelCoin() {
             className="w-20 h-20 rounded-full border-4 border-white"
           />
           <div className="ml-4 text-white">
-            <h1 className="text-2xl font-bold">MrBeast Coin</h1>
-            <p className="text-sm opacity-90">@MrBeast</p>
+            <h1 className="text-2xl font-bold">{trendingChannels[Number(id)].name}</h1>
+            <p className="text-sm opacity-90">{"@"+trendingChannels[Number(id)].creator}</p>
           </div>
         </div>
       </div>
@@ -27,9 +56,9 @@ export function ChannelCoin() {
       {/* Coin Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: 'Price', value: '$45.78', icon: DollarSign, change: '+8.7%' },
+          { label: 'Price', value: trendingChannels[Number(id)].price, icon: DollarSign, change: trendingChannels[Number(id)].change },
           { label: 'Market Cap', value: '$45.7M', icon: BarChart3 },
-          { label: '24h Volume', value: '$2.5M', icon: TrendingUp },
+          { label: '24h Volume', value: trendingChannels[Number(id)].volume, icon: TrendingUp },
           { label: 'Holders', value: '12,345', icon: Users },
         ].map((stat, i) => (
           <div key={i} className="bg-white rounded-lg shadow-md p-6">

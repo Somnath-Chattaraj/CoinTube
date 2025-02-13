@@ -1,5 +1,6 @@
 // import React from 'react';
 import { TrendingUp, TrendingDown, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function Home() {
   const trendingChannels = [
@@ -50,8 +51,9 @@ export function Home() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Trending Channel Coins</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {trendingChannels.map((channel) => (
-            <div
+          {trendingChannels.map((channel, id) => (
+            <Link
+              to= {"/coin/" + `${id}`}
               key={channel.name}
               className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition hover:scale-105"
             >
@@ -79,7 +81,7 @@ export function Home() {
                   24h Volume: {channel.volume}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
