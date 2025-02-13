@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { TrendingUp, Users, DollarSign, BarChart3 } from 'lucide-react';
 
 export function ChannelCoin() {

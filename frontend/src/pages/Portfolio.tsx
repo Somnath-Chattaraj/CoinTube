@@ -1,5 +1,5 @@
-import React from 'react';
-import { Coins, ArrowUpRight, ArrowDownRight, Gift } from 'lucide-react';
+// import React from 'react';
+import { ArrowUpRight, ArrowDownRight, Gift } from 'lucide-react';
 
 export function Portfolio() {
   const portfolio = [

@@ -1,11 +1,7 @@
-import React from 'react';
+// import React from 'react';
 import { TrendingUp, TrendingDown, Star } from 'lucide-react';
 
-interface HomeProps {
-  onNavigate: (page: string) => void;
-}
-
-export function Home({ onNavigate }: HomeProps) {
+export function Home() {
   const trendingChannels = [
     {
       name: 'PewDiePie Coin',
@@ -57,7 +53,6 @@ export function Home({ onNavigate }: HomeProps) {
           {trendingChannels.map((channel) => (
             <div
               key={channel.name}
-              onClick={() => onNavigate('channel')}
               className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition hover:scale-105"
             >
               <img
