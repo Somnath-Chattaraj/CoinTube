@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String?
+  walletAddress String   @unique
+  wallets       Wallet[]
+  createdAt     DateTime @default(now())
+}
+
+model Wallet {
+  id                String        @id @default(uuid())
+  walletAddress     String        @unique
+  user              User          @relation(fields: [userId], references: [id])
+  userId            String
+  tokens            WalletToken[]
+  buyerTransactions Transaction[]  @relation("BuyerTransactions")
+  sellerTransactions Transaction[] @relation("SellerTransactions")
+  listedTokens      ListedToken[]
+  createdAt         DateTime      @default(now())
+}
+
+model Token {
+  id                      String        @id @default(uuid())
+  tokenAddress            String        @unique
+  name                    String
+  price                   Float
+  creatorAddress          String
+  royaltyRecipientAddress String
+  transactions            Transaction[]
+  walletTokens            WalletToken[]
+  listedTokens            ListedToken[]
+  createdAt               DateTime      @default(now())
+}
+
+model WalletToken {
+  id            String   @id @default(uuid())
+  wallet        Wallet   @relation(fields: [walletAddress], references: [walletAddress])
+  walletAddress String
+  token         Token    @relation(fields: [tokenAddress], references: [tokenAddress])
+  tokenAddress  String
+  quantity      Int
+  price         Float
+  createdAt     DateTime @default(now())
+
+  @@unique([walletAddress, tokenAddress])
+}
+
+model Transaction {
+  id                  String   @id @default(uuid())
+  token               Token    @relation(fields: [tokenAddress], references: [tokenAddress])
+  tokenAddress        String
+  buyer               Wallet   @relation("BuyerTransactions", fields: [buyerWalletAddress], references: [walletAddress])
+  buyerWalletAddress  String
+  seller              Wallet   @relation("SellerTransactions", fields: [sellerWalletAddress], references: [walletAddress])
+  sellerWalletAddress String
+  amount              Int
+  price               Float
+  timestamp           DateTime @default(now())
+
+  @@index([tokenAddress])
+  @@index([buyerWalletAddress])
+  @@index([sellerWalletAddress])
+}
+
+model ListedToken {
+  id                  String   @id @default(uuid())
+  token               Token    @relation(fields: [tokenAddress], references: [tokenAddress])
+  tokenAddress        String
+  seller              Wallet   @relation(fields: [sellerWalletAddress], references: [walletAddress])
+  sellerWalletAddress String
+  price               Float
+  amount              Int
+  createdAt           DateTime @default(now())
+
+  @@unique([tokenAddress, sellerWalletAddress])
+}
