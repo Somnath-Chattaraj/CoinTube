@@ -1,8 +1,42 @@
 // import React from 'react';
-import { TrendingUp, TrendingDown, Star } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Car } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { tokens } from '@/lib/tokens';
+import axios from 'axios';
+import { BACKEND_URL } from '../config';
+
+interface tokenList {
+  tokenId : String,
+  tokenAddress: String,
+  name : String,
+  symbol : String,
+  tokenPrice: Number,
+  walletAddress: String,
+  Seller_name: String,
+  email: String,
+  amount: Number
+}
+
 export function Home() {
+
+  const [tokenList, setTokenList] = useState<tokenList[]>([]);
+  const [loading, setLoading] = useState(false);
+  const fetchTokenList = async () => {
+    setLoading(true);
+    try{
+      const response = await axios.get(`${BACKEND_URL}/token/listedToken`);
+      setTokenList(response.data);
+      console.log(response.data);
+      setLoading(false);
+    }
+    catch (error){
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    
+  });
   // const trendingChannels = [
   //   {
   //     name: 'PewDiePie Coin',
@@ -26,7 +60,6 @@ export function Home() {
   //     image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=400&h=400&fit=crop',
   //   },
   // ];
-  const trendingChannels = tokens.slice(0,3);
 
   const marketNews = [
     {
@@ -52,34 +85,34 @@ export function Home() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Trending Channel Coins</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {trendingChannels.map((channel) => (
+
+          {tokenList.map((token) => (
             <Link
-              to= {"/coin/" + `${channel.id}`}
-              key={channel.name}
+              to= {"/coin/" + `${token.tokenAddress}`}
               className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition hover:scale-105"
             >
-              <img
+              {/* <img
                 src={channel.image}
                 alt={channel.name}
-                className="w-full h-48 object-contain"
-              />
+                className="w-full h-48 object-cover"
+              /> */}
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900">{channel.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{token.name}</h3>
                 <div className="mt-2 flex justify-between items-center">
-                  <span className="text-2xl font-bold text-gray-900">{channel.price}</span>
-                  <span className={`flex items-center ${
-                    channel.change>0 ? 'text-green-600' : 'text-red-600'
+                  <span className="text-2xl font-bold text-gray-900">{String(token.tokenPrice)} </span>
+                  {/* <span className={`flex items-center ${
+                    channel.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {channel.change ? (
+                    {channel.change.startsWith('+') ? (
                       <TrendingUp className="h-4 w-4 mr-1" />
                     ) : (
                       <TrendingDown className="h-4 w-4 mr-1" />
                     )}
                     {channel.change}
-                  </span>
+                  </span> */}
                 </div>
                 <div className="mt-2 text-sm text-gray-500">
-                  24h Volume: {channel.volume}
+                  Volume: {String(token.amount)}
                 </div>
               </div>
             </Link>

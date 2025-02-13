@@ -26,7 +26,30 @@ export const transaction = asyncHandler(
 
 export const listedToken = asyncHandler(
     async (req: Request, res: Response) => {
-        const listedTokens = await prisma.listedToken.findMany();
-        res.status(200).json(listedTokens);
+        const listedTokens = await prisma.listedToken.findMany({
+            select: {
+                token: true,
+                seller: {
+                    select: {
+                        walletAddress: true,
+                        user: true
+                    }
+                },
+                price: true,
+                amount: true
+            }
+        });
+        const formattedTokens = listedTokens.map(({ token, seller, price, amount }) => ({
+            tokenId: token.id,
+            tokenAddress: token.tokenAddress,
+            name: token.name,
+            symbol: token.symbol,
+            tokenPrice: token.price,
+            walletAddress: seller.walletAddress,
+            Seller_name: seller.user.name,
+            email: seller.user.email,
+            amount
+        }));
+        res.status(200).json(formattedTokens);
     }
 );
