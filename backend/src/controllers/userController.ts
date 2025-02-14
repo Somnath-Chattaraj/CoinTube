@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 // Register User
 export const registerUser = asyncHandler(
   async (req: Request, res: Response) => {
-    const {email} = req.body;
+    const {email,name} = req.body;
 
     if (!email) {
       res
@@ -27,7 +27,8 @@ export const registerUser = asyncHandler(
 
     const user = await prisma.user.create({
         data: {
-            email
+            email,
+            name
         }
     });
 
