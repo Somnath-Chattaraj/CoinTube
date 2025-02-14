@@ -8,19 +8,12 @@ export const transaction = asyncHandler(
         const userId = (req as any).user?.id;
         const { tokenAddress } = req.params;
 
-        const token = await prisma.token.findUnique({
-            where: { tokenAddress },
-            select: {
-                name: true,
-                symbol: true,
-                price: true,
-                creatorAddress: true,
-                royaltyRecipientAddress: true,
-                transactions: true,
-                listedTokens: true
+        const transactions = await prisma.transaction.findMany({
+            where: {
+                tokenAddress
             }
         });
-        res.status(200).json(token);
+        res.status(200).json(transactions);
     }
 );
 
