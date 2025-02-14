@@ -11,6 +11,7 @@ model User {
   id            String   @id @default(uuid())
   email         String   @unique
   name          String?
+  subscribers   Int?
   wallets       Wallet[]
   createdAt     DateTime @default(now())
 }
@@ -20,6 +21,7 @@ model Wallet {
   walletAddress     String        @unique
   user              User          @relation(fields: [userId], references: [id])
   userId            String
+  royaltReceived    Float        @default(0)
   tokens            WalletToken[]
   buyerTransactions Transaction[]  @relation("BuyerTransactions")
   sellerTransactions Transaction[] @relation("SellerTransactions")
@@ -35,6 +37,7 @@ model Token {
   price                   Float
   creatorAddress          String
   royaltyRecipientAddress String
+  royaltyFee              Float        @default(0)  
   transactions            Transaction[]
   walletTokens            WalletToken[]
   listedTokens            ListedToken[]
