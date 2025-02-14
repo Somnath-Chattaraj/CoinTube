@@ -10,6 +10,10 @@ import { Marketplace} from './pages/marketplace'
 import { config } from './config';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Login } from './components/Login';
+import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { FetchYouTubeAccount } from './pages/FetchYoutubeData';
+import { UserProfile } from "./pages/Userprofile";
 
 const queryClient = new QueryClient();
 
@@ -18,7 +22,17 @@ function App() {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <Routes>
-          <Route path='/' element={<Layout/>}>
+          <Route path='/login' element={<Login/>}/>
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path='/youtube' element={<FetchYouTubeAccount />}/>
+          <Route path='/' element={<>
+          <SignedIn>
+            <Layout />
+          </SignedIn>
+          <SignedOut>
+            <Login/>
+          </SignedOut>
+          </>}>
             <Route path='/home' element={<Home />}/>
             <Route path='/trading' element={<Trading />}/>
             <Route path='/admin' element={<AdminDashboard />}/>
