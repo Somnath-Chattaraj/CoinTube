@@ -53,3 +53,24 @@ export const listedToken = asyncHandler(
         res.status(200).json(formattedTokens);
     }
 );
+
+
+export const createdToken = asyncHandler(
+    async (req: Request, res: Response) => {
+        const createdTokens = await prisma.token.findMany({
+            where: { creatorAddress: (req as any).user?.walletAddress },
+            select: {
+                id: true,
+                tokenAddress: true,
+                name: true,
+                symbol: true,
+                price: true,
+                creatorAddress: true,
+                royaltyRecipientAddress: true,
+                royaltyFee: true,
+                createdAt: true
+            }
+        });
+        res.status(200).json(createdTokens);
+    }
+);

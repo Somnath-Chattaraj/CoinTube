@@ -149,8 +149,10 @@ export const getUser = asyncHandler(
             wallets: {
                 select: {
                     walletAddress: true,
+                    royaltReceived: true,
                 }
-            }
+            },
+            subscribers: true,
         },
         });
     

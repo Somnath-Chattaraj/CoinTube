@@ -111,18 +111,7 @@ export function Layout() {
 
                 {isProfileOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                    <div className="py-1">
-                      <div className="px-4 py-2 text-sm text-gray-700">
-                        <div>Balance: 1,234 ETH</div>
-                        <div className="mt-1">Portfolio Value: $2.3M</div>
-                      </div>
-                      <hr />
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Settings
-                      </a>
+                  
                       <a
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -130,7 +119,6 @@ export function Layout() {
                         Logout
                       </a>
                     </div>
-                  </div>
                 )}
               </div>
 
