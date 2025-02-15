@@ -6,7 +6,10 @@ import tokenRouter from "./routes/tokenRoutes";
 const app = express();
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ],
     credentials: true
 }));
 app.use(cookieParser());
