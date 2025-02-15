@@ -9,8 +9,6 @@ import { parseEther } from 'viem';
 import { Abi, Address } from 'viem';
 import { marketplace_abi as marketplaceABI } from '@/lib/marketplace_abi';
 
-
-
 interface Transaction {
   id: string;
   price: number;
@@ -22,7 +20,7 @@ interface Transaction {
 
 interface ListedToken {
   id: string;
-  tokenAddress : string;
+  tokenAddress: string;
   sellerWalletAddress: string;
   price: number;
   amount: number;
@@ -43,10 +41,14 @@ export function ChannelCoin() {
   const { id } = useParams();
   const [token, setToken] = useState<Token | null>(null);
 
+  // Move hooks to the top level
+  const { writeContractAsync } = useWriteContract();
+  const { isSuccess } = useWaitForTransactionReceipt();
+
   useEffect(() => {
     const fetchToken = async () => {
       try {
-        const response = await axios.get<Token>(`${BACKEND_URL}/token/transaction/${id}`,{
+        const response = await axios.get<Token>(`${BACKEND_URL}/token/transaction/${id}`, {
           withCredentials: true,
         });
         setToken(response.data);
@@ -59,19 +61,17 @@ export function ChannelCoin() {
 
   const handleTransaction = async (
     type: 'buy',
-    sellerWalletAddress: String,
+    sellerWalletAddress: string,
     price: number,
     amount: number,
-    tokenAddress: String
+    tokenAddress: string
   ) => {
     if (type !== 'buy') return;
-  
+
     const amountInWei = parseEther((price * Number(amount)).toString());
-  
+
     try {
       // Execute transaction
-      const { writeContractAsync } = useWriteContract();
-  
       const txHash = await writeContractAsync({
         address: MARKETPLACE_CONTRACT_ADDRESS as Address,
         abi: marketplaceABI as Abi,
@@ -79,11 +79,10 @@ export function ChannelCoin() {
         args: [tokenAddress as Address, sellerWalletAddress as Address, Number(amount)],
         value: amountInWei, // Sending ETH in WEI
       });
-  
+
       console.log('Transaction Sent:', txHash);
-  
+
       // Wait for transaction confirmation
-      const { isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
       if (isSuccess) {
         console.log('Transaction Successful:', txHash);
       }
@@ -91,10 +90,11 @@ export function ChannelCoin() {
       console.error('Transaction Error:', error);
     }
   };
+
   if (!token) return <div className="text-center p-8">Loading...</div>;
 
   const totalListed = token.listedTokens.reduce((sum, lt) => sum + lt.amount, 0);
-  const totalVolume = token.transactions.reduce((sum, t) => sum + (t.amount * t.price), 0);
+  const totalVolume = token.transactions.reduce((sum, t) => sum + t.amount * t.price, 0);
 
   return (
     <div className="space-y-6">
@@ -147,19 +147,19 @@ export function ChannelCoin() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={token.transactions}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="timestamp" 
-                  tickFormatter={(ts : any) => new Date(ts).toLocaleDateString()}
+                <XAxis
+                  dataKey="timestamp"
+                  tickFormatter={(ts: any) => new Date(ts).toLocaleDateString()}
                 />
                 <YAxis />
                 <Tooltip
                   labelFormatter={(ts: any) => new Date(ts).toLocaleString()}
-                  formatter={(value : any) => [`$${Number(value).toFixed(4)}`, 'Price']}
+                  formatter={(value: any) => [`$${Number(value).toFixed(4)}`, 'Price']}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="price" 
-                  stroke="#8884d8" 
+                <Line
+                  type="monotone"
+                  dataKey="price"
+                  stroke="#8884d8"
                   dot={false}
                   strokeWidth={2}
                 />
@@ -196,7 +196,6 @@ export function ChannelCoin() {
             <p className="text-gray-500 text-sm">No tokens currently listed for sale.</p>
           )}
         </div>
-
       </div>
 
       {/* Recent Transactions */}

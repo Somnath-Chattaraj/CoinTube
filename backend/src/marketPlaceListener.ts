@@ -51,66 +51,71 @@ async function main() {
     });
 
 
-contract.on(
-  "TokenSold",
-  async (token: string, buyer: string, seller: string, amount: BigInt, priceInWei: BigInt) => {
-    console.log("Token sold", token, buyer, seller, amount, priceInWei);
-    try {
-      const parsedPrice = parseFloat(ethers.formatEther(Number(priceInWei)));
-
-      // ✅ Use Prisma transaction batch instead of wrapping in a single async function
-      await prisma.$transaction([
-        // Insert transaction record
-        prisma.transaction.create({
-          data: {
-            token: { connect: { tokenAddress: token } },
-            buyer: { connect: { walletAddress: buyer } },
-            seller: { connect: { walletAddress: seller } },
-            amount: Number(amount),
-            price: parsedPrice,
-          },
-        }),
-
-        // Remove listed tokens
-        prisma.listedToken.deleteMany({
-          where: { tokenAddress: token, sellerWalletAddress: seller },
-        }),
-
-        // ✅ Update buyer's wallet token (Upsert)
-        prisma.walletToken.upsert({
-          where: { walletAddress_tokenAddress: { walletAddress: buyer, tokenAddress: token } },
-          update: {
-            quantity: { increment: Number(amount) },
-            price: parsedPrice,
-          },
-          create: {
-            walletAddress: buyer,
-            tokenAddress: token,
-            quantity: Number(amount),
-            price: parsedPrice,
-          },
-        }),
-
-        // ✅ Update seller's wallet token (Upsert)
-        prisma.walletToken.upsert({
-          where: { walletAddress_tokenAddress: { walletAddress: seller, tokenAddress: token } },
-          update: {
-            quantity: { decrement: Number(amount) },
-            price: parsedPrice,
-          },
-          create: {
-            walletAddress: seller,
-            tokenAddress: token,
-            quantity: 0,
-            price: parsedPrice,
-          },
-        }),
-      ]);
-    } catch (error) {
-      console.error("Error handling TokenSold event:", error);
-    }
-  }
-);
+    contract.on(
+        "TokenSold",
+        async (token: string, buyer: string, seller: string, amount: BigInt, priceInWei: BigInt) => {
+          console.log("Token sold", token, buyer, seller, amount, priceInWei);
+          try {
+            const parsedPrice = parseFloat(ethers.formatEther(Number(priceInWei)));
+      
+            await prisma.$transaction(
+              async (tx) => {
+                // ✅ Insert transaction record
+                await tx.transaction.create({
+                  data: {
+                    token: { connect: { tokenAddress: token } },
+                    buyer: { connect: { walletAddress: buyer } },
+                    seller: { connect: { walletAddress: seller } },
+                    amount: Number(amount),
+                    price: parsedPrice,
+                  },
+                });
+      
+                // ✅ Remove listed tokens
+                await tx.listedToken.deleteMany({
+                  where: { tokenAddress: token, sellerWalletAddress: seller },
+                });
+      
+                // ✅ Update buyer's wallet token (Upsert)
+                await tx.walletToken.upsert({
+                  where: { walletAddress_tokenAddress: { walletAddress: buyer, tokenAddress: token } },
+                  update: {
+                    quantity: { increment: Number(amount) },
+                    price: parsedPrice,
+                  },
+                  create: {
+                    walletAddress: buyer,
+                    tokenAddress: token,
+                    quantity: Number(amount),
+                    price: parsedPrice,
+                  },
+                });
+      
+                // ✅ Update seller's wallet token (Upsert)
+                await tx.walletToken.upsert({
+                  where: { walletAddress_tokenAddress: { walletAddress: seller, tokenAddress: token } },
+                  update: {
+                    quantity: { decrement: Number(amount) },
+                    price: parsedPrice,
+                  },
+                  create: {
+                    walletAddress: seller,
+                    tokenAddress: token,
+                    quantity: 0,
+                    price: parsedPrice,
+                  },
+                });
+              },
+              { timeout: 20000 } // ✅ Increase timeout to 20 seconds
+            );
+      
+            console.log("Transaction processed successfully.");
+          } catch (error) {
+            console.error("Error handling TokenSold event:", error);
+          }
+        }
+      );
+      
 
 
     contract.on("TokenDelisted", async (token, seller) => {
