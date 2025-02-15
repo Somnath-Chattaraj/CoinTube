@@ -7,30 +7,22 @@ import bcrypt from "bcrypt";
 // Register User
 export const registerUser = asyncHandler(
   async (req: Request, res: Response) => {
-    const {email,name} = req.body;
+    const { email, name } = req.body;
 
     if (!email) {
-      res
-        .status(400)
-        .json({ message: "Please provide an email and a password" });
+      res.status(400).json({ message: "Please provide an email and a password" });
       return;
     }
 
-    const userExists = await prisma.user.findUnique({
+    const user = await prisma.user.upsert({
       where: { email },
+      update: {},
+      create: {
+        email,
+        name,
+      },
     });
 
-    if (userExists) {
-      res.status(400).json({ message: "User already exists" });
-      return;
-    }
-
-    const user = await prisma.user.create({
-        data: {
-            email,
-            name
-        }
-    });
 
     const exp = Date.now() + 1000 * 60 * 60 * 5;
     const token = jwt.sign({ sub: user.id, exp }, process.env.SECRET!);

@@ -15,6 +15,6 @@ export const config = createConfig({
     [sepolia.id]: http(),
   },
 })
-export const BACKEND_URL = "http://localhost:3000/api";
+export const BACKEND_URL = "http://localhost:3001/api";
 export const MARKETPLACE_CONTRACT_ADDRESS = import.meta.env.VITE_MARKETPLACE_CONTRACT_ADDRESS;
 export const TOKEN_CONTRACT_ADDRESS = import.meta.env.VITE_TOKEN_CONTRACT_ADDRESS;

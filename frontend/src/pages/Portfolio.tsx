@@ -58,7 +58,9 @@ export function Portfolio() {
   const fetchPortfolio = async () => {
     setLoading(true);
     try {
-      const res = await axios.get<UserProfile>(`${BACKEND_URL}/user/getTokens`);
+      const res = await axios.get<UserProfile>(`${BACKEND_URL}/user/getTokens`,{
+        withCredentials: true,
+      });
       setUser(res.data);
     } catch (error) {
       console.error('Error fetching user portfolio:', error);
