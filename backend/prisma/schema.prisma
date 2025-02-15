@@ -84,5 +84,5 @@ model ListedToken {
   amount              Int
   createdAt           DateTime @default(now())
 
-  @@unique([tokenAddress, sellerWalletAddress])
+  @@unique([tokenAddress, sellerWalletAddress]) // 🔥 Add this line
 }

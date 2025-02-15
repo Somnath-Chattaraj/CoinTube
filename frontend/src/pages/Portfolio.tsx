@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BACKEND_URL, MARKETPLACE_CONTRACT_ADDRESS } from '@/config';
-import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import { Abi, Address } from 'viem';
+import { useWaitForTransactionReceipt, useWriteContract, useReadContract } from 'wagmi';
+import { Abi, Address, parseEther } from 'viem';
 import { token_abi } from '@/lib/token_lib';
 import { marketplace_abi } from '@/lib/marketplace_abi';
 
@@ -21,6 +21,7 @@ export interface Token {
 export interface Wallet {
   walletAddress: string;
   tokens: {
+    tokenAddress: `0x${string}`;
     token: Token;
     quantity: number;
   }[];
@@ -37,29 +38,33 @@ export function Portfolio() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [quantity, setQuantity] = useState<number>(0);
-  const { writeContractAsync } = useWriteContract();
-  const [txHash, setTxHash] = useState<string | null>(null);
   const [price, setPrice] = useState<number>(0);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [allowance, setAllowance] = useState<number>(0);
+
+  const { writeContractAsync } = useWriteContract();
+  const { isSuccess, isError, error } = useWaitForTransactionReceipt({
+    hash: txHash as Address,
+  });
 
   useEffect(() => {
     fetchPortfolio();
   }, []);
 
   useEffect(() => {
-    if (txHash) {
-      useWaitForTransactionReceipt({
-        hash: txHash as Address,
-        // @ts-ignore
-        onSuccess: () => console.log('Transaction Successful:', txHash),
-        onError: (error : any) => console.error('Transaction Failed:', error),
-      });
+    if (isSuccess) {
+      console.log('Transaction Successful:', txHash);
+      fetchPortfolio();
     }
-  }, [txHash]);
+    if (isError) {
+      console.error('Transaction Failed:', error);
+    }
+  }, [isSuccess, isError, txHash, error]);
 
   const fetchPortfolio = async () => {
     setLoading(true);
     try {
-      const res = await axios.get<UserProfile>(`${BACKEND_URL}/user/getTokens`,{
+      const res = await axios.get<UserProfile>(`${BACKEND_URL}/user/getTokens`, {
         withCredentials: true,
       });
       setUser(res.data);
@@ -70,35 +75,67 @@ export function Portfolio() {
     }
   };
 
+  /** ✅ Read Allowance at Component Level */
+  useEffect(() => {
+    const fetchAllowance = async () => {
+      if (!user || user.wallets.length === 0) return;
+      const userWallet = user.wallets[0].walletAddress; // Assume first wallet for now
+
+      const result = useReadContract({
+        address: user.wallets[0].tokens[0].tokenAddress as Address, // Assume first token for now
+        abi: token_abi as Abi,
+        functionName: "allowance",
+        args: [userWallet, MARKETPLACE_CONTRACT_ADDRESS as Address],
+      });
+
+      setAllowance(Number(result));
+    };
+
+    fetchAllowance();
+  }, [user]);
+
+  /** ✅ Function to Approve Allowance Before Listing */
+  const approveIfNeeded = async (token: Token, quantity: number) => {
+    if (allowance < quantity) {
+      console.log(`Approving ${quantity} ${token.name}...`);
+      const approveTx = await writeContractAsync({
+        address: token.tokenAddress as Address,
+        abi: token_abi as Abi,
+        functionName: "approveMarketplace",
+      });
+      console.log("Approval Transaction Hash:", approveTx);
+      setTxHash(approveTx);
+    }
+  };
+
+  /** ✅ Sell Token Function */
   const handleSellToken = async (token: Token, quantity: number, price: number) => {
     if (quantity <= 0) {
-      alert("Quantity must be greater than 0");
+      alert('Quantity must be greater than 0');
       return;
     }
 
     try {
-      console.log(`Selling ${quantity} ${token.name} (${token.symbol})`);
+      console.log(`Preparing to sell ${quantity} ${token.name} (${token.symbol})...`);
 
-      // Approve Marketplace to Spend Tokens
-      const approveTx = await writeContractAsync({
-        address: token.tokenAddress as Address,
-        abi: token_abi as Abi,
-        functionName: 'approveMarketplace',
-      });
-      console.log('Approval Transaction Hash:', approveTx);
-      setTxHash(approveTx);
+      // ✅ Step 1: Approve only if needed
+      await approveIfNeeded(token, quantity);
 
-      // Sell Token on Marketplace
+      // ✅ Step 2: Convert price to WEI before listing
+      const priceInWei = parseEther(price.toString());
+
+      // ✅ Step 3: List token for sale on the marketplace
       const sellTx = await writeContractAsync({
         address: MARKETPLACE_CONTRACT_ADDRESS as Address,
         abi: marketplace_abi as Abi,
-        functionName: 'listTokenForSale',
-        args: [token.tokenAddress as Address, quantity, price],
+        functionName: "listTokenForSale",
+        args: [token.tokenAddress as Address, priceInWei, quantity],
       });
-      console.log('Sell Transaction Hash:', sellTx);
+
+      console.log("Sell Transaction Hash:", sellTx);
       setTxHash(sellTx);
     } catch (error) {
-      console.error('Error selling token:', error);
+      console.error("Error selling token:", error);
     }
   };
 
@@ -126,10 +163,6 @@ export function Portfolio() {
             <h2 className="text-lg font-semibold text-gray-900">Total Balance</h2>
             <p className="mt-2 text-3xl font-bold text-gray-900">${totalBalance.toFixed(2)}</p>
           </div>
-          {/* <div>
-            <h2 className="text-lg font-semibold text-gray-900">Staking Rewards</h2>
-            <p className="mt-2 text-3xl font-bold text-gray-900">$890.45</p>
-          </div> */}
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Total Coins</h2>
             <p className="mt-2 text-3xl font-bold text-gray-900">{totalCoins}</p>
@@ -143,8 +176,8 @@ export function Portfolio() {
           <h2 className="text-lg font-semibold text-gray-900">Your Holdings</h2>
         </div>
         <div className="divide-y divide-gray-200">
-          {user.wallets.map(wallet =>
-            wallet.tokens.map(token => (
+          {user.wallets.map((wallet) =>
+            wallet.tokens.map((token) => (
               <div key={token.token.id} className="p-6 flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="ml-4">
