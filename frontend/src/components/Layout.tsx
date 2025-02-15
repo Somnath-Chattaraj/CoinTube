@@ -9,6 +9,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { SignOutButton } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react';
 
 
 export function Layout() {
@@ -17,6 +19,12 @@ export function Layout() {
   const { connectors, connect } = useConnect();
   const { isConnected, address } = useAccount();
   const { disconnect } = useDisconnect();
+  const navigate = useNavigate();
+  const { user } = useUser();
+
+  if(!user){
+    navigate('/login');
+  }
 
   const navigation = [
     { name: 'Home', value: 'home' },
@@ -124,7 +132,7 @@ export function Layout() {
                       >
                         Settings
                       </a>
-                      <SignOutButton redirectUrl='/'>
+                      <SignOutButton redirectUrl='/login'>
                       <button
                         className="py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left pl-4"
                       >

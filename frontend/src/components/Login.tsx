@@ -12,7 +12,7 @@ export const Login=()=>{
           {isSignUp ? "Create an Account" : "Welcome Back"}
         </h2>
 
-        {isSignUp ? <SignUp afterSignInUrl="/" /> : <SignIn forceRedirectUrl="/home" />}
+        {isSignUp ? <SignUp /> : <SignIn forceRedirectUrl="/home" />}
 
         <p className="text-center mt-4">
           {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}

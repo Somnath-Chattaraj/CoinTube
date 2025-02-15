@@ -14,6 +14,7 @@ import { Login } from './components/Login';
 import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 import { FetchYouTubeAccount } from './pages/FetchYoutubeData';
 import { UserProfile } from "./pages/Userprofile";
+import { AdminDashboard2 } from './pages/AdminDashboard2';
 
 const queryClient = new QueryClient();
 
@@ -26,16 +27,17 @@ function App() {
           <Route path="/profile" element={<UserProfile />} />
           <Route path='/youtube' element={<FetchYouTubeAccount />}/>
           <Route path='/' element={<>
-          <SignedIn>
-            <Layout />
-          </SignedIn>
-          <SignedOut>
+          {/* <SignedIn>
+            <L />
+          </SignedIn> */}
+          {/* <SignedOut>
             <Login/>
-          </SignedOut>
+          </SignedOut> */}
+          <Layout />
           </>}>
             <Route path='/home' element={<Home />}/>
             <Route path='/trading' element={<Trading />}/>
-            <Route path='/admin' element={<AdminDashboard />}/>
+            <Route path='/admin' element={<AdminDashboard2 />}/>
             <Route path='/portfolio' element={<Portfolio />}/>
             <Route path='/coin/:id' element={<ChannelCoin />}/>
             <Route path='/marketplace' element={<Marketplace />}/>
