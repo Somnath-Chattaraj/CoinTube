@@ -12,6 +12,10 @@ import { Label } from "@/components/ui/label";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useWriteContract } from "wagmi";
+import { tokenFactor_abi } from "@/lib/tokenFactor_abi";
+import { Abi } from "viem";
+import { TOKEN_CONTRACT_ADDRESS } from "@/config";
 
 // Define the Zod schema
 const formSchema = z.object({
@@ -32,7 +36,6 @@ const formSchema = z.object({
     .refine((val) => Number(val) <= 10, {
       message: "Royalty fee must not exceed 10",
     }),
-  add: z.string().min(1, "Marketplace address is required"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -50,9 +53,22 @@ export function LoginForm({
     mode: "onChange", // Validate on change
   });
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
+  // ✅ Move useWriteContract outside onSubmit
+  const { writeContractAsync } = useWriteContract();
+
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log(data);
-    // Handle form submission
+    try {
+      const txHash = await writeContractAsync({
+        address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
+        abi: tokenFactor_abi as Abi,
+        functionName: "createYouTubeToken",
+        args: [data.token, data.symbol, Number(data.init), Number(data.fee)],
+      });
+      console.log("Transaction Sent:", txHash);
+    } catch (error) {
+      console.error("Error minting token:", error);
+    }
   };
 
   return (
@@ -107,17 +123,6 @@ export function LoginForm({
                   {...register("fee")}
                 />
                 {errors.fee && <span className="text-red-500">{errors.fee.message}</span>}
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="add">Marketplace Address</Label>
-                <Input
-                  id="add"
-                  type="text"
-                  placeholder=""
-                  {...register("add")}
-                />
-                {errors.add && <span className="text-red-500">{errors.add.message}</span>}
               </div>
 
               <Button type="submit" className="w-full" disabled={!isValid}>

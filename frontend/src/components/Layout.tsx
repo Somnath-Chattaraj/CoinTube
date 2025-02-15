@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Wallet, User, Menu, X, Youtube } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
@@ -23,6 +23,27 @@ export function Layout() {
   const { disconnect } = useDisconnect();
   const navigate = useNavigate();
   const { user } = useUser();
+
+  const fetchWalletData = async (walletAddress: string) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/user/updateWallet`, {
+        wallet_address : walletAddress,
+      },
+    {
+      withCredentials: true,
+    });
+      console.log('Wallet data received:', response.data);
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+    }
+  };
+
+  // Trigger API call when the wallet is connected
+  useEffect(() => {
+    if (isConnected && address) {
+      fetchWalletData(address);
+    }
+  }, [isConnected]);
 
   if(!user){
     navigate('/login');
