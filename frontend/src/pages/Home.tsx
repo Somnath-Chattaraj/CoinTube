@@ -6,21 +6,21 @@ import axios from 'axios';
 import { BACKEND_URL } from '../config';
 import { useUser, useAuth } from '@clerk/clerk-react';
 
-interface tokenList {
-  tokenId : String,
-  tokenAddress: String,
-  name : String,
-  symbol : String,
-  tokenPrice: Number,
-  walletAddress: String,
-  Seller_name: String,
-  email: String,
-  amount: Number
+interface Token {
+  tokenId: string;
+  tokenAddress: string;
+  name: string;
+  symbol: string;
+  tokenPrice: number;
+  walletAddress: string;
+  Seller_name: string;
+  email: string;
+  amount: number;
 }
 
 export function Home() {
-
-  const [tokenList, setTokenList] = useState<tokenList[]>([]);
+  // Renamed state variable to avoid conflict with the Token type
+  const [tokenListData, setTokenListData] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
   const { getToken } = useAuth(); // Get access token
@@ -146,34 +146,21 @@ export function Home() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Trending Channel Coins</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          {tokenList.map((token) => (
+          {tokenListData.map((token) => (
             <Link
-              to= {"/coin/" + `${token.tokenAddress}`}
+              key={token.tokenAddress}
+              to={`/coin/${token.tokenAddress}`}
               className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition hover:scale-105"
             >
-              {/* <img
-                src={channel.image}
-                alt={channel.name}
-                className="w-full h-48 object-cover"
-              /> */}
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-900">{token.name}</h3>
                 <div className="mt-2 flex justify-between items-center">
-                  <span className="text-2xl font-bold text-gray-900">{String(token.tokenPrice)} </span>
-                  {/* <span className={`flex items-center ${
-                    channel.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {channel.change.startsWith('+') ? (
-                      <TrendingUp className="h-4 w-4 mr-1" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4 mr-1" />
-                    )}
-                    {channel.change}
-                  </span> */}
+                  <span className="text-2xl font-bold text-gray-900">
+                    ${token.tokenPrice.toFixed(2)}
+                  </span>
                 </div>
                 <div className="mt-2 text-sm text-gray-500">
-                  Volume: {String(token.amount)}
+                  Volume: {token.amount}
                 </div>
               </div>
             </Link>

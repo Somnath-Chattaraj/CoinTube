@@ -81,6 +81,7 @@ async function main() {
                         price: parseFloat(ethers.formatEther(priceInWei)),
                     },
                 });
+                
             });
         } catch (error) {
             console.error("Error handling TokenSold event:", error);
