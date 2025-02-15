@@ -46,7 +46,9 @@ export function ChannelCoin() {
   useEffect(() => {
     const fetchToken = async () => {
       try {
-        const response = await axios.get<Token>(`${BACKEND_URL}/token/${id}`);
+        const response = await axios.get<Token>(`${BACKEND_URL}/token/transaction/${id}`,{
+          withCredentials: true,
+        });
         setToken(response.data);
       } catch (error) {
         console.error('Error fetching token:', error);

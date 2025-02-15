@@ -56,7 +56,11 @@ export const listedToken = asyncHandler(
 
 
 export const createdToken = asyncHandler(
+    // @ts-ignore
     async (req: Request, res: Response) => {
+        if (!(req as any).user?.walletAddress) {
+            return res.status(201).json(null);
+        }
         const createdTokens = await prisma.token.findMany({
             where: { creatorAddress: (req as any).user?.walletAddress },
             select: {

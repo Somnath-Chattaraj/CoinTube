@@ -124,7 +124,7 @@ export function Marketplace() {
                       <p className="text-sm text-muted-foreground">by {token.Seller_name}</p>
                       <p className="text-sm text-muted-foreground">{token.email}</p>
                     </div>
-                    <Link to={"/coin/" + `${token.tokenId}`}>
+                    <Link to={"/coin/" + `${token.tokenAddress}`}>
                       <Button variant="outline" size="sm">
                         Trade
                       </Button>

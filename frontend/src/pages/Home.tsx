@@ -73,23 +73,23 @@ export function Home() {
   // console.log(user);
   // console.log(token);
   // console.log(channelData);
-  // const fetchTokenList = async () => {
-  //   setLoading(true);
-  //   try{
-  //     const response = await axios.get(`${BACKEND_URL}/token/listedToken`);
-  //     //@ts-ignore
-  //     setTokenList(response.data);
-  //     console.log(response.data);
-  //     setLoading(false);
-  //   }
-  //   catch (error){
-  //     console.error(error);
-  //     setLoading(false);
-  //   }
-  // };
-  // useEffect(() => {
-    
-  // });
+  const fetchTokenList = async () => {
+    setLoading(true);
+    try{
+      const response = await axios.get(`${BACKEND_URL}/token/listedToken`);
+      //@ts-ignore
+      setTokenList(response.data);
+      console.log(response.data);
+      setLoading(false);
+    }
+    catch (error){
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchTokenList()
+  },[]);
   // const trendingChannels = [
   //   {
   //     name: 'PewDiePie Coin',
