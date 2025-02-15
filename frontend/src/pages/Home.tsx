@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { BACKEND_URL } from '../config';
+import { useUser, useAuth } from '@clerk/clerk-react';
 
 interface tokenList {
   tokenId : String,
@@ -21,22 +22,74 @@ export function Home() {
 
   const [tokenList, setTokenList] = useState<tokenList[]>([]);
   const [loading, setLoading] = useState(false);
-  const fetchTokenList = async () => {
-    setLoading(true);
-    try{
-      const response = await axios.get(`${BACKEND_URL}/token/listedToken`);
-      setTokenList(response.data);
-      console.log(response.data);
-      setLoading(false);
-    }
-    catch (error){
-      console.error(error);
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
+  const { user } = useUser();
+  const { getToken } = useAuth(); // Get access token
+  const [token, setToken] = useState<string | null>(null);
+  const [channelData, setChannelData] = useState(null);
+
+  // useEffect(() => {
+  //   async function fetchChannel() {
+  //     try {
+  //       // Get the Google OAuth access token
+  //       const googleToken = await getToken({ template: "google" });
+  //       setToken(googleToken)
+  //     if (!googleToken) {
+  //       console.error("Failed to get Google OAuth token");
+  //       return;
+  //     }
+
+  //     // Get actual Google access token from user's external accounts
+  //     // const googleAccount = user?.externalAccounts.find(
+  //     //   (account) => account.provider == "google"
+  //     // );
+      
+  //     // if (!googleAccount?.oauthAccessToken) {
+  //     //   console.error("No Google OAuth access token found");
+  //     //   return;
+  //     // }
+  //     // console.log(googleAccount);
+  //     // // Call YouTube API with actual Google token
+  //     // const response = await fetch("https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true", {
+  //     //   headers: {
+  //     //     Authorization: `Bearer ${googleToken}`,
+  //     //     Accept: "application/json",
+  //     //   },
+  //     // });
+
+  //     const data = await response.json();
+  //     setChannelData(data);
+  //   } catch (error) {
+  //     console.error("Error fetching YouTube channel data:", error);
+  //   }
+  // }
+
+  // if (user) {
+  //   fetchChannel();
+  // }
+
+  //   fetchChannel();
+  // }, [getToken]);
+
+  // console.log(user);
+  // console.log(token);
+  // console.log(channelData);
+  // const fetchTokenList = async () => {
+  //   setLoading(true);
+  //   try{
+  //     const response = await axios.get(`${BACKEND_URL}/token/listedToken`);
+  //     //@ts-ignore
+  //     setTokenList(response.data);
+  //     console.log(response.data);
+  //     setLoading(false);
+  //   }
+  //   catch (error){
+  //     console.error(error);
+  //     setLoading(false);
+  //   }
+  // };
+  // useEffect(() => {
     
-  });
+  // });
   // const trendingChannels = [
   //   {
   //     name: 'PewDiePie Coin',
@@ -60,7 +113,15 @@ export function Home() {
   //     image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=400&h=400&fit=crop',
   //   },
   // ];
-
+  // console.log(user?.fullName);
+  // console.log(user?.primaryEmailAddress?.emailAddress);
+  const sendUserData = async () => {
+    const response = await axios.post(`${BACKEND_URL}/user/signup`, {
+      email: user?.primaryEmailAddress?.emailAddress
+    }, {withCredentials: true})
+    console.log(response.data);
+  }
+  sendUserData();
   const marketNews = [
     {
       title: 'New Creator Coin Launch: Tech Reviews Daily',

@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { SignOutButton } from '@clerk/clerk-react';
 
 
 export function Layout() {
@@ -123,12 +124,13 @@ export function Layout() {
                       >
                         Settings
                       </a>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      <SignOutButton redirectUrl='/'>
+                      <button
+                        className="py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left pl-4"
                       >
                         Logout
-                      </a>
+                      </button>
+                      </SignOutButton>
                     </div>
                   </div>
                 )}
