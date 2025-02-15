@@ -11,6 +11,8 @@ import {
 import { SignOutButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
+import { BACKEND_URL } from '@/config';
+import axios from 'axios';
 
 
 export function Layout() {
@@ -133,9 +135,7 @@ export function Layout() {
                         Settings
                       </a>
                       <SignOutButton redirectUrl='/login'>
-                      <button
-                        className="py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left pl-4"
-                      >
+                      <button>
                         Logout
                       </button>
                       </SignOutButton>

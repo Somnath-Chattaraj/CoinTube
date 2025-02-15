@@ -1,8 +1,35 @@
 // import React from 'react';
+import { BACKEND_URL } from '@/config';
+import axios from 'axios';
 import { DollarSign, Users, TrendingUp, Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
+interface Token {
+  id: String,
+  tokenAddress: String,
+  name: String,
+  symbol: String,
+  price: Number,
+  creatorAddress: String,
+  royaltyRecipientAddress: String,
+  royaltyFee: Number,
+  createdAt: String
+}
 
 export function AdminDashboard() {
+
+  const [ createdTokens, setTokens ] = useState<Token[]>();
+  useEffect(() => {
+    const fetchTokens = async () => {
+      const tokens = await axios.get(`${BACKEND_URL}/token/createdToken`, {
+        withCredentials: true
+      });
+      //@ts-ignore
+      setTokens(tokens.data);
+    }
+    fetchTokens();
+  }, [])
+
   const transactions = [
     {
       type: 'Royalty',
