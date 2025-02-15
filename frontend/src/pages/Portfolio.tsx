@@ -39,6 +39,7 @@ export function Portfolio() {
   const [quantity, setQuantity] = useState<number>(0);
   const { writeContractAsync } = useWriteContract();
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [price, setPrice] = useState<number>(0);
 
   useEffect(() => {
     fetchPortfolio();
@@ -69,7 +70,7 @@ export function Portfolio() {
     }
   };
 
-  const handleSellToken = async (token: Token, quantity: number) => {
+  const handleSellToken = async (token: Token, quantity: number, price: number) => {
     if (quantity <= 0) {
       alert("Quantity must be greater than 0");
       return;
@@ -83,7 +84,6 @@ export function Portfolio() {
         address: token.tokenAddress as Address,
         abi: token_abi as Abi,
         functionName: 'approveMarketplace',
-        args: [MARKETPLACE_CONTRACT_ADDRESS, quantity],
       });
       console.log('Approval Transaction Hash:', approveTx);
       setTxHash(approveTx);
@@ -92,8 +92,8 @@ export function Portfolio() {
       const sellTx = await writeContractAsync({
         address: MARKETPLACE_CONTRACT_ADDRESS as Address,
         abi: marketplace_abi as Abi,
-        functionName: 'sellToken',
-        args: [token.tokenAddress as Address, quantity],
+        functionName: 'listTokenForSale',
+        args: [token.tokenAddress as Address, quantity, price],
       });
       console.log('Sell Transaction Hash:', sellTx);
       setTxHash(sellTx);
@@ -165,8 +165,15 @@ export function Portfolio() {
                       min="1"
                       max={token.quantity}
                     />
+                    <input
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(Number(e.target.value))}
+                      className="px-2 py-1 border rounded-md"
+                      min="1"
+                    />
                     <button
-                      onClick={() => handleSellToken(token.token, quantity)}
+                      onClick={() => handleSellToken(token.token, quantity, price)}
                       className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                     >
                       Sell

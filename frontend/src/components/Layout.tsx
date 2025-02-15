@@ -45,10 +45,7 @@ export function Layout() {
     }
   }, [isConnected]);
 
-  if(!user){
-    navigate('/login');
-  }
-
+  
   const navigation = [
     { name: 'Home', value: 'home' },
     { name: 'Trading', value: 'trading' },
